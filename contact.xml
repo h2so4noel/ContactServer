@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<contacts>
+    <contact id="101">
+        <title>Test contact</title>
+        <name>Joe Experimental</name>
+        <email>none@testing.com</email>
+        <phoneNumber>0</phoneNumber>
+    </contact>
+    <contact id="102">
+        <title>Another test contact</title>
+        <name>Testosterone</name>
+        <email>testee@foo.com</email>
+        <phoneNumber>0</phoneNumber>
+    </contact>
+    <contact id="1227">
+        <title>YYwqeqzZZZZZwewqeqwe</title>
+        <name>contact'sadasdasdme</name>
+        <email>contactail address</email>
+        <phoneNumber>0</phoneNumber>
+    </contact>
+</contacts>

@@ -6,6 +6,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 
+import contact.service.ContactDao;
+import contact.service.DaoFactory;
+import contact.service.mem.MemDaoFactory;
+
 
 /**
  * <p>
@@ -76,7 +80,7 @@ public class JettyMain {
 		ServletContextHandler context = new ServletContextHandler( ServletContextHandler.SESSIONS );
 		context.setContextPath("/");
 		ServletHolder holder = new ServletHolder( org.glassfish.jersey.servlet.ServletContainer.class );
-		holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, "service");
+		holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, "contact.service");
 		context.addServlet( holder, "/*" );
 		server.setHandler( context );
 		
@@ -86,6 +90,9 @@ public class JettyMain {
 		System.out.println("Server started.  Press ENTER to stop it.");
 		int ch = System.in.read();
 		System.out.println("Stopping server.");
+		DaoFactory dao = DaoFactory.getInstance();
+		dao.shutdown();
+		System.out.println("Files written");
 		server.stop();
 	}
 	

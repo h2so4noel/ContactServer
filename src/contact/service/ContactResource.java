@@ -1,7 +1,8 @@
-package service;
+package contact.service;
 
 import java.net.URI;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -12,47 +13,30 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBElement;
 
-import entity.ContactDAO;
-import entity.Contact;
+import contact.entity.Contact;
+import contact.service.jpa.JpaContactDao;
+
+
 
 /**
  * Contact resource handles many request using RESTful web services provided by JAX-RS.
- * Handles most of the services that met the requirements of contacts web service.
+ * Handles most of the services that met the requirements of contacts web service including GET, POST, PUT and DELETE.
  * @author Pawin Suthipornopas 5510546123
  */
 @Singleton
-@Path("/contacts")
+@Path("/contacts") 
 public class ContactResource {
-	private ContactDAO dao = new ContactDAO();
+	private ContactDao dao = DaoFactory.getInstance().getContactDao();
 	/**
 	 * Default constructor, leave blank since Jersey required.
 	 */
 	public ContactResource(){
-	}
-	
-	/**
-	 * Default GET method, return all contact entities.
-	 * @return Response to the user.
-	 */
-	@GET
-	public Response returnAll(){
-		return Response.ok().entity(dao.findAll()).build();
-	}
-	
-	/**
-	 * GET method to return contact corresponding to the given id.
-	 * @param id is the given integer of id.
-	 * @return Response to the user of type OK.
-	 */
-	@GET
-	@Path("/{id}")
-	@Produces(MediaType.TEXT_XML)
-	public Response returnContact(int id){
-		return Response.ok().type(MediaType.TEXT_XML).entity(dao.find(id)).build();
 	}
 	
 	/**
@@ -61,9 +45,27 @@ public class ContactResource {
 	 * @return Response to the user of type OK.
 	 */
 	@GET
-	@Produces(MediaType.TEXT_XML)
-	public Response returnTitle(@QueryParam("querystr") String str){
-		return Response.ok().type(MediaType.TEXT_XML).entity(dao.findTitle(str)).build();
+	@Produces(MediaType.APPLICATION_XML)
+	public Response returnTitle(@QueryParam("q") String str){
+		GenericEntity<List<Contact>> ent = new GenericEntity<List<Contact>>(dao.findAll()){};
+		if(str == null)
+			return Response.ok(ent).build();
+		else
+			return Response.ok(dao.findByTitle(str)).build();
+	}
+	
+	/**
+	 * GET method to return contact corresponding to the given id.
+	 * @param id is the given integer of id.
+	 * @return Response to the user of type OK.
+	 */
+	@GET
+	@Path("{id}")
+	@Produces(MediaType.APPLICATION_XML)
+	public Response returnContact(@PathParam("id") int id){
+		if(dao.find(id) != null)
+			return Response.ok(dao.find(id)).build();
+		return Response.noContent().build();
 	}
 	
 	/**
@@ -73,12 +75,16 @@ public class ContactResource {
 	 * @throws Exception in case of any number errors.
 	 */
 	@POST
-	@Consumes(MediaType.TEXT_XML)
+	@Consumes(MediaType.APPLICATION_XML)
 	public Response createContact(JAXBElement<Contact> cont) throws Exception{
-		System.out.println("tst");
+		System.out.println("Contact Created");
 		Contact contact = (Contact)cont.getValue();
-		dao.createContact(contact.getId(), contact.getTitle(), contact.getName(), contact.getEmail(), contact.getPhoneNumber());
-		return Response.created(new URI(contact.getId()+"")).type(MediaType.TEXT_XML).entity(contact).build();
+		if(dao.find(contact.getId()) == null){
+			dao.save(contact);
+			return Response.created(new URI(contact.getId()+"")).type(MediaType.APPLICATION_XML).entity(contact).build();
+		}
+		else
+			return Response.status(Response.Status.CONFLICT).build();
 	}
 	
 	/**
@@ -89,11 +95,11 @@ public class ContactResource {
 	 */
 	@PUT
 	@Path("{id}")
-	@Consumes(MediaType.TEXT_XML)
+	@Consumes(MediaType.APPLICATION_XML)
 	public Response updateContact(@PathParam("id") int id, JAXBElement<Contact> cont){
 		Contact contact = (Contact)cont.getValue();
-		if(dao.updateContact(contact) != 0)
-			return Response.ok().type(MediaType.TEXT_XML).entity(contact).build();
+		if(dao.update(contact) == true)
+			return Response.ok().entity(contact).build();
 		else
 			return Response.noContent().build();
 	}
