@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Contact class to store requested elements in the web service.
- * This is stored in List and does not know each other well in contact.
+ * This is in case for Marshall and Unmarshall because they can't handle the normal List class.
  * @author Pawin Suthipornopas 5510546123
  */
 @XmlRootElement(name="contacts")

@@ -22,8 +22,6 @@ import javax.xml.bind.JAXBElement;
 import contact.entity.Contact;
 import contact.service.jpa.JpaContactDao;
 
-
-
 /**
  * Contact resource handles many request using RESTful web services provided by JAX-RS.
  * Handles most of the services that met the requirements of contacts web service including GET, POST, PUT and DELETE.

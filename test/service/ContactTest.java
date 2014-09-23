@@ -64,7 +64,7 @@ public class ContactTest {
 	public void testGet2() throws Exception {
 		ContentResponse r = client.GET(url+10000);
 		System.out.println(r.getStatus());
-		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		assertEquals(204, r.getStatus());
 	}
 	
 	@Test
@@ -93,7 +93,7 @@ public class ContactTest {
 																"<phoneNumber>contact's telephone number</phoneNumber>"+
 																"</contact>");
 		ContentResponse r = client.newRequest(url).content(contact, "application/xml").method(HttpMethod.POST).send();
-		assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
+		assertEquals(409, r.getStatus());
 	}
 	
 	@Test
@@ -123,7 +123,7 @@ public class ContactTest {
 																"</contact>");
 		r = r.content(content, "application/xml");
 		ContentResponse res = r.send();
-		assertEquals(Status.OK.getStatusCode(), res.getStatus());
+		assertEquals(400, res.getStatus());
 	}
 	
 	@Test
@@ -148,6 +148,6 @@ public class ContactTest {
 		Request req = client.newRequest(url);
 		req = req.method(HttpMethod.DELETE);
 		ContentResponse r = req.send();
-		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		assertEquals(405, r.getStatus());
 	}
 }
