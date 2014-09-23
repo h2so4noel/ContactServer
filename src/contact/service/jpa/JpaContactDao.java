@@ -130,12 +130,15 @@ public class JpaContactDao implements ContactDao {
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
 		Contact contact = em.find(Contact.class, update.getId());
-		if(contact == null)
+		if(contact == null){
+			tx.commit();
 			return false;
+		}
 		contact.setName(update.getName());
 		contact.setTitle(update.getTitle());
 		contact.setEmail(update.getEmail());
 		contact.setPhoneNumber(update.getPhoneNumber());
+		tx.commit();
 		return true;
 	}
 }

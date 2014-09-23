@@ -65,6 +65,8 @@ public class JettyMain {
 	 * On Ubuntu or MacOS if you are not root then you must use a port > 1024.
 	 */
 	static final int PORT = 8080;
+	static int port = PORT;  // the port the server will listen to for HTTP requests
+	static Server server;
 
 	/**
 	 * Create a Jetty server and a context, add Jetty ServletContainer
@@ -75,26 +77,33 @@ public class JettyMain {
 	 * @throws Exception if Jetty server encounters any problem
 	 */
 	public static void main(String[] args) throws Exception {
-		int port = PORT;  // the port the server will listen to for HTTP requests
-		Server server = new Server( port );
+		startServer(port);
+		
+		System.out.println("Server started.  Press ENTER to stop it.");
+		int ch = System.in.read();
+		
+		System.out.println("Stopping server.");
+		DaoFactory dao = DaoFactory.getInstance();
+		dao.shutdown();
+		
+		System.out.println("Files written");
+		stopServer();
+	}
+	
+	public static void startServer(int port) throws Exception{
+		server = new Server( port );
 		ServletContextHandler context = new ServletContextHandler( ServletContextHandler.SESSIONS );
 		context.setContextPath("/");
 		ServletHolder holder = new ServletHolder( org.glassfish.jersey.servlet.ServletContainer.class );
 		holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, "contact.service");
 		context.addServlet( holder, "/*" );
 		server.setHandler( context );
-		
 		System.out.println("Starting Jetty server on port " + port);
 		server.start();
-		
-		System.out.println("Server started.  Press ENTER to stop it.");
-		int ch = System.in.read();
-		System.out.println("Stopping server.");
-		DaoFactory dao = DaoFactory.getInstance();
-		dao.shutdown();
-		System.out.println("Files written");
-		server.stop();
 	}
 	
+	public static void stopServer() throws Exception{
+		server.stop();
+	}
 }
 

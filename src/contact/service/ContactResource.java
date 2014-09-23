@@ -101,7 +101,7 @@ public class ContactResource {
 		if(dao.update(contact) == true)
 			return Response.ok().entity(contact).build();
 		else
-			return Response.noContent().build();
+			return Response.status(Status.BAD_REQUEST).build();
 	}
 	
 	/**
