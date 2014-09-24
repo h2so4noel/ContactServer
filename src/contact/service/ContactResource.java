@@ -44,7 +44,7 @@ public class ContactResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
-	public Response returnTitle(@QueryParam("q") String str){
+	public Response returnTitle(@QueryParam("title") String str){
 		GenericEntity<List<Contact>> ent = new GenericEntity<List<Contact>>(dao.findAll()){};
 		if(str == null)
 			return Response.ok(ent).build();
