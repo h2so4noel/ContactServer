@@ -13,9 +13,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBElement;
 
@@ -31,10 +35,12 @@ import contact.service.jpa.JpaContactDao;
 @Path("/contacts") 
 public class ContactResource {
 	private ContactDao dao = DaoFactory.getInstance().getContactDao();
+	private CacheControl cc = new CacheControl();
 	/**
 	 * Default constructor, leave blank since Jersey required.
 	 */
 	public ContactResource(){
+		cc.setMaxAge(99999);
 	}
 	
 	/**
@@ -60,10 +66,15 @@ public class ContactResource {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_XML)
-	public Response returnContact(@PathParam("id") int id){
-		if(dao.find(id) != null)
-			return Response.ok(dao.find(id)).build();
-		return Response.noContent().build();
+	public Response returnContact(@PathParam("id") int id,@Context Request req){
+		if(dao.find(id) == null)
+			return Response.noContent().build();
+		Response.ResponseBuilder rb = null;
+		EntityTag etag = new EntityTag(dao.find(id).hashCode()+"");
+		rb = req.evaluatePreconditions(etag);
+		if(rb != null)
+			return rb.cacheControl(cc).build();
+		return Response.ok(dao.find(id)).cacheControl(cc).tag(etag).build();
 	}
 	
 	/**
@@ -75,11 +86,12 @@ public class ContactResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
 	public Response createContact(JAXBElement<Contact> cont) throws Exception{
-		System.out.println("Contact Created");
 		Contact contact = (Contact)cont.getValue();
+		EntityTag etag = new EntityTag(contact.hashCode()+"");
 		if(dao.find(contact.getId()) == null){
+			System.out.println("Contact Created");
 			dao.save(contact);
-			return Response.created(new URI(contact.getId()+"")).type(MediaType.APPLICATION_XML).entity(contact).build();
+			return Response.created(new URI(contact.getId()+"")).type(MediaType.APPLICATION_XML).entity(contact).cacheControl(cc).tag(etag).build();
 		}
 		else
 			return Response.status(Response.Status.CONFLICT).build();
@@ -94,12 +106,16 @@ public class ContactResource {
 	@PUT
 	@Path("{id}")
 	@Consumes(MediaType.APPLICATION_XML)
-	public Response updateContact(@PathParam("id") int id, JAXBElement<Contact> cont){
-		Contact contact = (Contact)cont.getValue();
-		if(dao.update(contact) == true)
-			return Response.ok().entity(contact).build();
-		else
+	public Response updateContact(@PathParam("id") int id, JAXBElement<Contact> cont, @Context Request req){
+		if(dao.find(id) == null)
 			return Response.status(Status.BAD_REQUEST).build();
+		EntityTag etag = new EntityTag(dao.find(id).hashCode()+"");
+		Response.ResponseBuilder rb = req.evaluatePreconditions(etag);
+		if(rb != null)
+			return rb.cacheControl(cc).tag(etag).build();
+		Contact contact = (Contact)cont.getValue();
+		dao.update(contact);
+		return Response.ok().build();			
 	}
 	
 	/**
@@ -109,7 +125,14 @@ public class ContactResource {
 	 */
 	@DELETE
 	@Path("{id}")
-	public Response delete(@PathParam("id") int id){
+	public Response delete(@PathParam("id") int id, @Context Request req){
+		if(dao.find(id) != null){
+			Response.ResponseBuilder rb = null;
+			EntityTag etag = new EntityTag(dao.find(id).hashCode()+"");
+			rb = req.evaluatePreconditions(etag);
+			if(rb != null)
+				return rb.cacheControl(cc).build();
+		}
 		dao.delete(id);
 		return Response.ok().entity(id + " Deleted.").build();
 	}

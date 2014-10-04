@@ -148,6 +148,7 @@ public class ContactTest {
 	/**
 	 * Second PUT test method.
 	 * Same as previous method, but the id 1239 doesn't exist so this one should get error response.
+	 * UPDATED: as I've updated the service with cache along with ETag this test is no longer negative, but positive.
 	 * @throws Exception
 	 */
 	@Test
@@ -162,7 +163,7 @@ public class ContactTest {
 																"</contact>");
 		r = r.content(content, "application/xml");
 		ContentResponse res = r.send();
-		assertEquals(400, res.getStatus());
+		assertEquals(200, res.getStatus());
 	}
 	
 	/**
