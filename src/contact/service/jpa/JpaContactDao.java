@@ -92,6 +92,7 @@ public class JpaContactDao implements ContactDao {
 	 */
 	@Override
 	public boolean delete(long id) {
+//ERROR must use try - catch and rollback
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
 		Contact contact = em.find(Contact.class, id);
@@ -134,10 +135,13 @@ public class JpaContactDao implements ContactDao {
 			tx.commit();
 			return false;
 		}
+		// Don't do this. Use merge.
+		// What if we add more attributes to contact?  You'd forget to update this code.
 		contact.setName(update.getName());
 		contact.setTitle(update.getTitle());
 		contact.setEmail(update.getEmail());
 		contact.setPhoneNumber(update.getPhoneNumber());
+		//ERROR must use try - catch and rollback
 		tx.commit();
 		return true;
 	}

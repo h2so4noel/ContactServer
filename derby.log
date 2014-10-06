@@ -1,13 +1,13 @@
 ----------------------------------------------------------------
-Tue Sep 23 21:08:40 ICT 2014:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance a816c00e-0148-a2d7-ba83-000006a28aa0 
-on database directory C:\tmp\contactdb with class loader sun.misc.Launcher$AppClassLoader@2bd9c3e7 
-Loaded from file:/C:/Users/USER/Desktop/jpa/derby.jar
+Fri Oct 03 12:29:25 ICT 2014:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance a816c00e-0148-d47b-ee78-000005bb8618 
+on database directory /tmp/contactdb with class loader sun.misc.Launcher$AppClassLoader@4defb0be 
+Loaded from file:/opt/lib/derby/lib/derby.jar
 java.vendor=Oracle Corporation
-java.runtime.version=1.7.0_11-b21
-user.dir=C:\Java\eclipse_proj\ContactServer
-os.name=Windows 7
+java.runtime.version=1.7.0_67-b01
+user.dir=/home/jim/git/ws/Pawin/ContactServer
+os.name=Linux
 os.arch=amd64
-os.version=6.1
+os.version=3.13.0-36-generic
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''

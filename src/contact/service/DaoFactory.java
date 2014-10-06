@@ -27,6 +27,17 @@ public abstract class DaoFactory {
 	}
 	
 	/**
+	 * Set the concrete DaoFactory to use.
+	 * If used, this should be invoked before the first call
+	 * to getInstance(); otherwise, the factories will be
+	 * inconsistent.
+	 * @param theFactory
+	 */
+	public static void setFactory(DaoFactory theFactory) {
+		factory = theFactory;
+	}
+	
+	/**
 	 * Get a singleton instance of the DaoFactory.
 	 * @return instance of a concrete DaoFactory
 	 */

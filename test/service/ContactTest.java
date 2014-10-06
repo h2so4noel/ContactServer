@@ -14,6 +14,8 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.Server;
 import org.junit.*;
 
+import contact.service.DaoFactory;
+
 /**
  * JUnit test to test the Contact server in various request.
  * Send the request to the service by sending GET, PUT, POST and DELETE. Two times for each test.
@@ -35,13 +37,17 @@ public class ContactTest {
 	 */
 	@Before
 	public void beforeTest() throws Exception{
+//JIM: added because your tests were failing.
+// In fact, the tests should not depend or assume a particular implementation.
+		DaoFactory.setFactory( new contact.service.mem.MemDaoFactory() );
 		//Start Jetty
 		JettyMain.startServer(8080);
 		server = new Server(8080);
 		
 		//Setup Clients
 		client.start();
-		
+//BAD: you are *assuming* the URL.  Better to get it from the server.
+
 		//Setup URL
 		url = "http://localhost:8080/contacts/";
 	}
@@ -78,6 +84,7 @@ public class ContactTest {
 	 */
 	@Test
 	public void testGet2() throws Exception {
+//POOR: assuming this id is not in service
 		ContentResponse r = client.GET(url+10000);
 		System.out.println(r.getStatus());
 		assertEquals(204, r.getStatus());
@@ -100,6 +107,7 @@ public class ContactTest {
 		ContentResponse r = client.newRequest(url).content(contact, "application/xml").method(HttpMethod.POST).send();
 		assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
 		//Delete for further test
+//POOR: again assuming the id of contact
 		Request req = client.newRequest(url+9595);
 		req = req.method(HttpMethod.DELETE);
 		r = req.send();
@@ -113,6 +121,7 @@ public class ContactTest {
 	 */
 	@Test
 	public void testPost2() throws Exception {
+//POOR: don't assume this id exists
 		// id = 9999 already exist.
 		StringContentProvider contact = new StringContentProvider("<contact id=\"9999\">" +
 																"<title>test title</title>" +

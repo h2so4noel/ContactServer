@@ -45,10 +45,14 @@ public class ContactResource {
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	public Response returnTitle(@QueryParam("title") String str){
+// This is very inefficient.
+// You are asking the DAO to return ALL the contacts, but maybe you
+// don't need them.
 		GenericEntity<List<Contact>> ent = new GenericEntity<List<Contact>>(dao.findAll()){};
 		if(str == null)
 			return Response.ok(ent).build();
 		else
+//ERROR: should return 404 if no contacts match the title
 			return Response.ok(dao.findByTitle(str)).build();
 	}
 	
@@ -63,6 +67,7 @@ public class ContactResource {
 	public Response returnContact(@PathParam("id") int id){
 		if(dao.find(id) != null)
 			return Response.ok(dao.find(id)).build();
+//ERROR wrong response code
 		return Response.noContent().build();
 	}
 	
@@ -96,6 +101,9 @@ public class ContactResource {
 	@Consumes(MediaType.APPLICATION_XML)
 	public Response updateContact(@PathParam("id") int id, JAXBElement<Contact> cont){
 		Contact contact = (Contact)cont.getValue();
+// ERROR if no contact has this id then should return not found		
+		
+// "== true" is unnecssary since update() is boolean
 		if(dao.update(contact) == true)
 			return Response.ok().entity(contact).build();
 		else
@@ -110,6 +118,8 @@ public class ContactResource {
 	@DELETE
 	@Path("{id}")
 	public Response delete(@PathParam("id") int id){
+//ERROR you didn't check if delete succeeds.
+// Didn't check if id is found or not.
 		dao.delete(id);
 		return Response.ok().entity(id + " Deleted.").build();
 	}
